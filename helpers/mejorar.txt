@@ -1,0 +1,14 @@
+
+-------------------------Pedientes--------------------------------
+-Ventana de Conteo -> Ya pero falta arreglar algunas cosas
+-Separar todo mediante funciones en otros archivos usando lambda
+
+SEPARACIÓN DE CODIGO
+
+-------------------------Consideraciones--------------------------------
+-Puede que venga un curso con diferentes valores pero con el mismo codigo 
+    -Entonces volver a leer y ver que no hayan duplicados, y si es asi leer nomas el ultimo 
+    -De ahi pasarlo a la lista normal 
+
+-------------------------ERRORES--------------------------------
+-No se encuentra forma de eliminar codigos duplicados en una lista de listas

@@ -1,11 +1,12 @@
-import re
+
+from curses import window
 import tkinter as tk
 from tkinter import messagebox,ttk
 from tkinter.filedialog import askopenfile
 from tkinter.font import BOLD
 
-from Components.subject import Subject
-from Components.functions import add_an_existing_subject, edit_subject
+
+from Components.functions import add_an_existing_subject, approved_fun, edit_subject, select_file
 #Import the subject class
 #from Components.subject import Subject
 
@@ -63,47 +64,17 @@ class MainPage(tk.Tk):
         window.rowconfigure(0,weight=4)
         window.rowconfigure(1,weight=2)
         self.withdraw()
-
         #Functions
         def back():
             self.deiconify()
             window.destroy()
-
-        def select_file():
-            #We open the file
-            self.open_file = askopenfile(mode='r+')
-            #Chekend if there is a file
-            if not self.open_file:
-                return
-            #If the same file has already been opened only return
-            if self._var.get() == self.open_file.name:
-                return
-            #Open the file
-            with open(self.open_file.name,'r+') as file:
-                #We read the file
-                files = file.read()
-                data = []
-                #Split each course, then asign to a void list -> data
-                response = files.split('\n')
-                for i in response:
-                    data.append(i.split(',')) 
-                
-                #Iterate data to convert each value of each list an object Subject, then asign to self.subjects
-                for i in data:
-                    print(f' {i[0],i[1],str(i[2]),i[3],i[4],i[5],i[6]} ')
-                    obj = Subject(i[0],i[1],i[2],i[3],i[4],i[5],i[6])
-                    self.subjects.append(obj)
-                
-                #Change the rute
-                self._var.set(file.name)
-                messagebox.showinfo('Selección de archivo','Se ha cargado y leido correctamente el archivo.')
         #Label
         tk.Label(window,text='Ruta',font=("Verdana",12)).grid(row=0,column=0,sticky='WE',padx=8,pady=5)
         #Entry
         file_name = tk.Entry(window,textvariable=self._var,width=89)
         file_name.grid(row=0,column=1,sticky='WE',columnspan=2)
         #Buttons
-        btn_select = tk.Button(window,text='Seleccionar archivo',command=select_file,height=2,width=15)
+        btn_select = tk.Button(window,text='Seleccionar archivo',command=lambda: select_file(self),height=2,width=15)
         btn_select.grid(row=1,column=1,pady=2)
         btn_back = tk.Button(window,text='Regresar',command=back,height=2,width=15)
         btn_back.grid(row=1,column=2)
@@ -209,16 +180,21 @@ class MainPage(tk.Tk):
             #Functions
             def add():
                 #This function add a course
-                add_an_existing_subject(self, code, name, optional, semester, state, pre, credits)
-
+                if code.get() and name.get() and optional.get() and semester.get() and state.get() and credits.get():
+                    add_an_existing_subject(self,code,name,optional,semester,state,pre,credits)
+                else:
+                    messagebox.showerror('Error!','Debes ingresar todos los campos a expeción de Pre requisitos!')
+                
             btn_add = tk.Button(add_window,text='Agregar',command=add,height=2,width=15)
             btn_add.grid(row=7,column=0,padx=10,pady=10)
 
             def back():
                 window.deiconify()
                 add_window.destroy()
+                
             btn_back = tk.Button(add_window,text='Regresar',command=back,height=2,width=15)
             btn_back.grid(row=7,column=1,padx=10,pady=10)
+
         def edit_course():
             #Variables
             code = tk.StringVar(value='')
@@ -321,6 +297,7 @@ class MainPage(tk.Tk):
             list_combo = []
             for i in self.subjects:
                 list_combo.append(i.nombre)
+
             combo = ttk.Combobox(
                 delete_window,
                 values= list_combo,
@@ -369,18 +346,81 @@ class MainPage(tk.Tk):
     #Third buttom command -> Count the credtis
     def _count_credits(self):
 
-        window = tk.Toplevel(self)
-        window.geometry('600x700+700+100')
-        window.title('Contare Creditos')
+        count_window = tk.Toplevel(self)
+        count_window.geometry('700x700+700+100')
+        count_window.title('Contare Creditos')
+        
         self.withdraw()
 
-        #Buttons
+        #Variable
+        approved_sub = tk.StringVar(value='')
+        cursing_sub = tk.StringVar(value='')
+        pending_sub = tk.StringVar(value='')
+        required_credtis = tk.StringVar(value='Créditos Obligatorios hasta el semestre:')
+
+        #Fun
+        approved_fun(self,approved_sub,cursing_sub,pending_sub)
+        def selection_changed(event):
+            total_credits = 0
+            n_semester = combo.get()
+            #Calculated the credits of the semester 1 to N, only the required courses
+            for i in self.subjects:
+                if int(i.semestre) <= int(n_semester) and i.obligatorio == 'Obligatorio':
+                    total_credits += int(i.creditos)
+
+            required_credtis.set(f'Créditos Obligatorios hasta el semestre {n_semester}: {total_credits} créditos ')
+
+            print(f'Creditos totales = {total_credits} ')
+        
+        def count_credits_per_semester():
+            #semester 
+            semester = spin.get()
+            c_a = 0
+            c_c = 0
+            c_p = 0
+            #Filter by semester
+            for i in self.subjects:
+                if int(i.semestre) == int(semester):
+                    if i.estado == 'Aprobado':
+                        c_a += int(i.creditos)
+                    elif i.estado == 'Cursando':
+                        c_c += int(i.creditos)
+                    elif i.estado == 'Pendiente':
+                        c_p += int(i.creditos)
+            print(semester)
+            messagebox.showinfo(f'Creditos del semestre {semester}', f'Creditos de cursos aprobados {c_a} \n Créditos de cursos asignados {c_c} \n Créditos de cursos pendientes {c_p} ')
+             
+        #labels
+        tk.Label(count_window,text=f'Créditos Aprobados: {approved_sub.get()} ',font=('Arial',12,BOLD)).grid(row=0,column=0,padx=5,pady=15)
+        tk.Label(count_window,text=f'Créditos Cursando: {cursing_sub.get()} ',font=('Arial',12,BOLD)).grid(row=1,column=0,padx=5,pady=15)
+        tk.Label(count_window,text=f'Créditos Pendientes: {pending_sub.get()} ',font=('Arial',12,BOLD)).grid(row=2,column=0,padx=5,pady=15)
+        tk.Label(count_window,textvariable=required_credtis,font=('Arial',12,BOLD)).grid(row=3,column=0,padx=5,pady=15)
+        tk.Label(count_window,text='Semestre:',font=('Arial',12,BOLD)).grid(row=4,column=0,padx=5,pady=15)
+        
+        #Numeric selection
+        list_combo = [x for x in range(1,11)]
+        
+        combo = ttk.Combobox(
+            count_window,
+            values= list_combo,
+            state='readonly'
+        )
+        combo.bind("<<ComboboxSelected>>",selection_changed)
+        combo.grid(row=4,column=1,padx=5,pady=10,columnspan=2,ipadx=30,ipady=8)
+
+        #Spin
+        spin = ttk.Spinbox(count_window,from_=1,to=10,font=('Arial',14,BOLD))
+        spin.grid(row=5,column=0,padx=2,pady=10,columnspan=2,ipadx=5,ipady=5)
+        #Button
+        btn_filter = tk.Button(count_window,text='Contar',command=count_credits_per_semester,height=2,width=15)
+        btn_filter.grid(row=5,column=1,padx=2,pady=10,columnspan=2,ipadx=5,ipady=5)
+
         #Quit
         def back():
             self.deiconify()
-            window.destroy()
-        btn_back = tk.Button(window,text='Regresar',command=back,height=2,width=15)
-        btn_back.grid(row=4,column=0)
+            count_window.destroy()
+        btn_back = tk.Button(count_window,text='Regresar',command=back,height=2,width=15)
+        btn_back.grid(row=6,column=0,rowspan=2)
 
     
 
