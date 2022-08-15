@@ -12,3 +12,7 @@ SEPARACIÓN DE CODIGO
 
 -------------------------ERRORES--------------------------------
 -No se encuentra forma de eliminar codigos duplicados en una lista de listas
+
+-------------------------RUBRICA--------------------------------
+-Decifrar los caracteres -> UTF-8 implementarlo en python 
+-Ver validaciones en todas las ventanas 
