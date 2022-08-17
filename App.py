@@ -1,12 +1,8 @@
-
-
 import tkinter as tk
 from tkinter import messagebox,ttk
 from tkinter.font import BOLD
-
-
+#Import functions
 from Components.functions import add_an_existing_subject, approved_fun, edit_subject, select_and_show_course, select_file
-
 
 class MainPage(tk.Tk):
 
@@ -19,7 +15,6 @@ class MainPage(tk.Tk):
         self['background']='#dbdbdb'
         #Grid
         self.columnconfigure(0,weight=1)
-
         #Variables
         self._var = tk.StringVar(value='Ruta del archivo...')
         #Containt the file 
@@ -157,7 +152,7 @@ class MainPage(tk.Tk):
             combo.bind("<<ComboboxSelected>>",selection_changed)
             combo.grid(row=0,column=0,padx=80,pady=10,rowspan=2,columnspan=2,ipadx=30,ipady=8,sticky='WE')
             #Functions
-            def mostrar():
+            def show():
                 show_window.geometry('450x430+760+200')
                 #Variables
                 select = combo.get()
@@ -170,7 +165,7 @@ class MainPage(tk.Tk):
                 tk.Label(show_window,textvariable=credits,font=('Arial',12,BOLD)).grid(row=8,column=0,padx=5,pady=10,columnspan=2,sticky='WE')
                 tk.Label(show_window,textvariable=state,font=('Arial',12,BOLD)).grid(row=9,column=0,padx=5,pady=10,columnspan=2,sticky='WE')
 
-            btn_show = tk.Button(show_window,text='Mostrar Curso',command=mostrar,height=2,width=15)
+            btn_show = tk.Button(show_window,text='Mostrar Curso',command=show,height=2,width=15)
             btn_show.grid(row=2,column=0,ipadx=10,padx=60,rowspan=1)
 
             def back():
@@ -229,9 +224,19 @@ class MainPage(tk.Tk):
             state_entry.grid(row=6,column=1,sticky='WE',ipadx=8,ipady=8,padx=5,pady=10)
             #Functions
             def add():
-                #This function add a course
+                #This function add a course and validated
                 if code.get() and name.get() and optional.get() and semester.get() and state.get() and credits.get():
-                    add_an_existing_subject(self,code,name,optional,semester,state,pre,credits)
+                    try:
+                      if int(code.get()) and int(semester.get()) and int(credits.get()):
+                        if optional.get() == 'Obligatorio' or optional.get() == 'Obligatorio' or optional.get() == 'obligatorio' or optional.get() == 'obligatorio':
+                            if state.get() == 'Aprobado' or state.get() == 'Cursando' or state.get() == 'Pendiente':
+                                add_an_existing_subject(self,code,name,optional,semester,state,pre,credits)
+                            else:
+                                messagebox.showerror('Error','Debes escribir correctamente el estado')
+                        else:
+                            messagebox.showerror('Error','Debes escribir correctamente la opcionalidad')
+                    except ValueError:
+                        messagebox.showerror('Error','Debes ingresar un número valido en Código, semestre o créditos')
                 else:
                     messagebox.showerror('Error!','Debes ingresar todos los campos a expeción de Pre requisitos!')
                 
@@ -319,11 +324,21 @@ class MainPage(tk.Tk):
             #Functions
             def edit():
                 #This function add a course
+                #This function add a course and validated
                 if code.get() and name.get() and optional.get() and semester.get() and state.get() and credits.get():
-                    edit_subject(self,code,name,optional,semester,state,pre,credits)
+                    try:
+                      if int(code.get()) and int(semester.get()) and int(credits.get()):
+                        if optional.get() == 'Obligatorio' or optional.get() == 'Obligatorio' or optional.get() == 'obligatorio' or optional.get() == 'obligatorio':
+                            if state.get() == 'Aprobado' or state.get() == 'Cursando' or state.get() == 'Pendiente':
+                                edit_subject(self,code,name,optional,semester,state,pre,credits)
+                            else:
+                                messagebox.showerror('Error','Debes escribir correctamente el estado')
+                        else:
+                            messagebox.showerror('Error','Debes escribir correctamente la opcionalidad')
+                    except ValueError:
+                        messagebox.showerror('Error','Debes ingresar un número valido en Código, semestre o créditos')
                 else:
                     messagebox.showerror('Error!','Debes ingresar todos los campos a expeción de Pre requisitos!')
-
             btn_edit = tk.Button(edit_window,text='Editar',command=edit,height=2,width=15)
             btn_edit.grid(row=8,column=0,padx=10,pady=10)
 
@@ -338,7 +353,7 @@ class MainPage(tk.Tk):
         def delete_course():
             delete_window = tk.Toplevel(window)
             delete_window.geometry('280x300+700+200')
-            delete_window.title('Editar Curso')
+            delete_window.title('Eliminar Curso')
             delete_window.rowconfigure(0,weight=3)
             delete_window.rowconfigure(1,weight=2)
             window.withdraw()
@@ -426,7 +441,6 @@ class MainPage(tk.Tk):
 
             required_credtis.set(f'Créditos Obligatorios hasta el semestre {n_semester}: {total_credits} créditos ')
 
-            print(f'Creditos totales = {total_credits} ')
         
         def count_credits_per_semester():
             #semester 

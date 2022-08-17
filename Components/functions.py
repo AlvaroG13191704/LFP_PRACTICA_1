@@ -31,14 +31,16 @@ def select_file(self):
         for i in response:
             data.append(i.split(','))
         # First fill a list with only the code of the courses
+        data.reverse()
+        print(data)
         for i in data:
             nums.append(i[0])
+        # Reverse the list
         # If the code is duplicated, only use the first of them
         for i in range(len(nums)):
             if nums[i] not in new_nums:
                 new_nums.append(nums[i])
                 new.append(data[i])
-        print(new)
         # Iterate data to convert each value of each list an object Subject, then asign to self.subjects
         for i in new:
             # print(f' {i[0],i[1],str(i[2]),i[3],i[4],i[5],i[6]} ')
@@ -54,7 +56,6 @@ def select_file(self):
 def add_an_existing_subject(self, code, name, optional, semester, state, pre, credits):
     obligatorio = ''
     estado = ''
-
     # Transform the values
     if optional.get() == 'Opcional':
         obligatorio = '0' 
@@ -129,6 +130,7 @@ def add_an_existing_subject(self, code, name, optional, semester, state, pre, cr
             'Agregar Curso',
             f'Se ha agregado el curso con código{obj.codigo} correctamente!.'
         )
+        
 def select_and_show_course(self, code, name, optional, semester, state, pre, credits,comboget):
     for i in self.subjects:
         if i.nombre == comboget:
