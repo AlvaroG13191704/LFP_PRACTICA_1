@@ -451,17 +451,21 @@ class MainPage(tk.Tk):
                 c_a = 0
                 c_c = 0
                 c_p = 0
+                total = 0
                 #Filter by semester
                 for i in self.subjects:
                     if int(i.semestre) == int(semester):
                         if i.estado == 'Aprobado':
                             c_a += int(i.creditos)
+                            total +=int(i.creditos)
                         elif i.estado == 'Cursando':
                             c_c += int(i.creditos)
+                            total +=int(i.creditos)
                         elif i.estado == 'Pendiente':
                             c_p += int(i.creditos)
+                            total +=int(i.creditos)
                 print(semester)
-                messagebox.showinfo(f'Creditos del semestre {semester}', f'Creditos de cursos aprobados {c_a} \n Créditos de cursos asignados {c_c} \n Créditos de cursos pendientes {c_p} ')
+                messagebox.showinfo(f'Creditos del semestre {semester}', f'Creditos de cursos aprobados {c_a} \n Créditos de cursos asignados {c_c} \n Créditos de cursos pendientes {c_p} \n Total de créditos {total} ')
                 
         #labels
         tk.Label(count_window,text=f'Créditos Aprobados: {approved_sub.get()} ',font=('Arial',12,BOLD)).grid(row=0,column=0,padx=5,pady=5,sticky='WE')

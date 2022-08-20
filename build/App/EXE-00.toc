@@ -60,7 +60,7 @@
  [],
  False,
  False,
- 1660755369,
+ 1661033203,
  [('run.exe',
    'E:\\2022\\CUARTO SEMESTRE\\LENGUAJES '
    'FORMALES\\LABORATORIO\\PRACTICA_1\\venv\\lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit\\run.exe',
